@@ -1,0 +1,43 @@
+
+stages:
+  -initiation : affichant un message d'initialisation du pipeline ;
+  -tests-unitaires : lançant les tests unitaires ;
+  -qualite-du-code : lançant l'analyse avec sonar scanner
+
+  affichant un message d'initialisation du pipeline-job:
+         stage: initiation
+         script: 
+             echo "initialisation du pipeline"
+
+  lançant les tests unitaires-job:
+         stage: tests-unitaires
+         variables:
+             XDEBUG_MODE : "coverage"
+         artifacts : 
+            when : always
+            reports :
+                junit : phpunit-execution-result.xml
+            paths :   
+               -phpunit-execution-result.xml
+               -phpunit-coverage-result.xml
+            script : 
+              -vendor/bin/phpunit --coverage clover=phpunit
+              -coverage-result.xml --log-junit=phpunit
+              -execution-result.xml
+
+  lançant l'analyse avec sonar scanner-job:
+         stage : qualite-du-code
+         variables : 
+             GIT-CLEAN-FLAGS : none
+         script: 
+          x:\... . .\sonar-scanner\bin\sonar.scanner.bat                                                          
+         -D"sonar.qualitygate.wait=true"
+         -D"sonar.projectKey=xxxxxx"
+         -D"sonar.sources=."
+         -D"sonar.host.url=http://localhost:9000"
+         -D"sonar.login=sqp_b9aa370f704fe3dd28397a418e28ffea28c715fe"
+       
+
+            
+            
+
